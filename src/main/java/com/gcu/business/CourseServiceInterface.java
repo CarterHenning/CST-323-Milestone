@@ -41,11 +41,8 @@ public interface CourseServiceInterface
     public CourseModel getCourseById(int id);
 
     
-    /**
-     * Deletes a course by its ID.
-     *
-     * @param id the ID of the course to delete
-     * @return true if the deletion was successful, false otherwise
-     */
     public boolean deleteCourse(int id);
+
+    
+    public void updateCourseRating(int courseId, int newRating);
 }

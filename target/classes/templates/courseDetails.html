@@ -6,35 +6,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Course Details</title>
     <style>
-        /* CSS for the hero banner */
-
-        /* Other styles for the details */
         .card {
-            display: flex;
-            flex-direction: column;
-            margin: auto;
-            width: 60%;
-            border: 1px solid #ccc;
+            margin: 1rem;
+            background-color: #272727;
+            transition: background-color .5s ease, transform ease .5s;
+            transform: scale(1);
+            border: 1px solid white;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            background-color: #f9f9f9;
         }
 
-        .card-image {
-            width: 100%;
-            max-height: 50vh;
+        .card:hover {
+            background-color: #2d2d2d;
+            transform: scale(1.01);
+        }
+
+        .card img {
+            height: 25vh;
             object-fit: cover;
         }
 
-        .text-content {
-            padding: 20px;
+        .card-body {
+           padding: 1vw;
         }
 
-        .buttons-container {
-            margin: 20px;
-            display: flex;
-            align-self: flex-end;
-            gap: 20px;
+
+        .card-text {
+              font-size: 2.2em;  
         }
 
         .hero-content {
@@ -47,6 +44,15 @@
         {
             border-radius: 10px;
             background-color: #272727;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .addButton {
+            margin: 0 20px;
+            align-self: flex-end;
+            font-size: 1.3em;;
         }
 
     </style>
@@ -64,13 +70,13 @@
         </div>
 
         <div class="reviews-container">
+            <a th:href="@{'/addReview/' + ${courseModel.id}}" class="addButton">Add</a>
             <div class="card" th:each="reviewModel : ${reviews}">
-                <a th:href="@{'/review/' + ${reviewModel.id}}">
+                <a th:href="@{'/review/' + ${reviewModel.reviewId}}">
                     <div class="card-body">
                         <div style="display: flex; justify-content: space-between;">
                             <div style="width: 80%;">
-                                <h1 th:text="${reviewModel.title}" style="font-weight: 700;"></h1>
-                                <p class="card-text" th:text="${reviewModel.description}"></p>
+                                <h1 class="card-text" th:text="${reviewModel.description}"></h1>
                             </div>
 
 

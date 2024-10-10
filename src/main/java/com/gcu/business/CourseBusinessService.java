@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.gcu.data.CoursesDataService;
 import com.gcu.data.entity.CourseEntity;
+import com.gcu.data.repository.CourseRepository;
 import com.gcu.model.CourseModel;
 
 /**
@@ -17,6 +18,14 @@ public class CourseBusinessService implements CourseServiceInterface
 {    
     @Autowired
 	private CoursesDataService service;
+
+
+    @Override
+    public void updateCourseRating(int courseId, int newRating) {
+        CourseModel course = getCourseById(courseId);
+        course.setRating(newRating);
+        updateCourse(course, course.getId());
+    }
 
     /**
      * Retrieves the list of all courses.

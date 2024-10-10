@@ -1,5 +1,6 @@
 package com.gcu.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +12,13 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.gcu.data.UsersDataService;
 import com.gcu.data.entity.UserEntity;
@@ -22,9 +26,11 @@ import jakarta.servlet.http.HttpServletRequest;
 
 // import com.gcu.business.LoginService;
 import com.gcu.business.RegistrationService;
+import com.gcu.business.ReviewServiceInterface;
 import com.gcu.business.CourseServiceInterface;
 // import com.gcu.model.LoginModel;
 import com.gcu.model.CourseModel;
+import com.gcu.model.ReviewModel;
 import com.gcu.model.SignUpModel;
 
 import jakarta.validation.Valid;
@@ -43,6 +49,9 @@ public class HomeController {
 
     @Autowired
     private CourseServiceInterface service;
+
+    @Autowired
+    private ReviewServiceInterface reviewService;
 
     @Autowired
     private UsersDataService usersDataService;
@@ -182,8 +191,7 @@ public class HomeController {
         model.addAttribute("title", "RateMyCourse");
         return "signIn";
     }
-
-
+    
 
     /**
      * Processes the creation of a new course.
@@ -227,7 +235,10 @@ public class HomeController {
     public String showCourseDetails(@PathVariable int id, Model model) {
         // Logic to retrieve the course details by id
         CourseModel course = service.getCourseById(id);
+        List<ReviewModel> reviews = reviewService.getReviewsByCourseId(id);
         model.addAttribute("courseModel", course);
+        model.addAttribute("reviews", reviews);
+        
         return "courseDetails";
     }
 
@@ -288,6 +299,55 @@ public class HomeController {
         model.addAttribute("courses", courses);
 
         return "redirect:/";
+    }
+
+
+
+
+
+    @GetMapping("/addReview/{courseId}")
+    public String showAddReviewForm(@PathVariable("courseId") int courseId, Model model, HttpServletRequest request) {
+        // Retrieve the course by ID
+        CourseModel course = service.getCourseById(courseId);
+        
+        // Retrieve the user ID from the session
+        Integer userId = (Integer) request.getSession().getAttribute("userId");
+
+        // Create a new ReviewModel and set courseId and userId
+        ReviewModel review = new ReviewModel();
+        review.setCourseId(courseId);
+        if (userId != null) {
+            review.setUserId(userId); // Set user ID only if available
+        }
+
+        // Add the necessary attributes to the model
+        model.addAttribute("courseModel", course);
+        model.addAttribute("reviewModel", review);
+
+        // Return the name of the Thymeleaf template (e.g., addUserReview.html)
+        return "addUserReview";
+    }
+
+    @PostMapping("/doCreateReview")
+    public String doCreateReview(@Valid ReviewModel reviewModel, @SessionAttribute("userId") int userId, BindingResult bindingResult, Model model) {
+        try {
+                reviewModel.setUserId(userId);
+
+                // Save the review using the service
+                reviewService.createReview(reviewModel);
+
+                int averageRating = reviewService.calculateAverageRating(reviewModel.getCourseId());
+
+        
+                service.updateCourseRating(reviewModel.getCourseId(), averageRating);
+
+                return "redirect:/course/" + reviewModel.getCourseId();
+
+        } catch (Exception e) {
+            // Handle any exceptions that might occur
+            
+            return "redirect:/addReview/" + reviewModel.getCourseId(); // Redirect back to the form
+        }
     }
 }   
 

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/mainTemplate">
+<head>
+    <title>Create Course</title>
+    <style>
+       button {
+        width: 75px;
+        margin-right: 10px;
+        margin-top: 8px;
+      }
+      
+      .container {
+          background-color: #272727;
+          border-radius: 10px;
+          padding: 50px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          width: 25vw;
+          margin-top: 40px;
+      }
+
+      h1 {
+        font-size: 2em;
+        font-weight: bold;
+        padding-bottom: 10px
+      }
+
+      h2 {
+          font-size: 2em;
+          margin-bottom: 20px;
+          text-align: center;
+      }
+
+      label {
+          font-size: 1.2em;
+          display: block;
+      }
+
+      input {
+          padding: 0px;
+          margin-bottom: 15px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          width: 100%;
+          color: black;
+      }
+
+      button {
+          background-color: rgb(72, 72, 72);
+          border-radius: 10px;
+          width: 50%;
+          border: transparent;
+          font-size: 1.2em;
+          color: white;
+          cursor: pointer;
+      }
+
+      button:hover {
+          background-color: #9c9c9c;
+      }
+
+      .error-message {
+          color: red;
+          font-size: 0.8em;
+          margin-top: -10px;
+          margin-bottom: 10px;
+      }
+      .hero {
+        width: 100vw; 
+        display: grid; 
+        place-items: center;
+        padding: 50px;
+      }
+    </style>
+</head>
+<body>
+    <section layout:fragment="content">
+        <div style="display: grid; place-items: center;">
+            <h1 th:text="'Create a Review for ' + ${courseModel.title}"></h1>
+        </div>
+        <div class="container">
+            <form action="#" th:action="@{/doCreateReview}" th:object="${reviewModel}" method="post">
+
+                <label for="title">Description</label>
+                <input type="text" id="description" th:field="*{description}" />
+
+                <label for="description">Rating:</label>
+                <input id="description" th:field="*{rating}"></input>
+
+                <input type="hidden" th:field="*{courseId}" th:value="courseModel.id" />
+
+                <button type="submit" value="Submit">Create Review</button>
+            </form>
+        </div>
+    </section>
+</body>
+</html>
