@@ -1,0 +1,18 @@
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="layouts/signInTemplate"
+>
+  <body>
+    <div layout:fragment="content" class="flex-container">
+      <form method="get" action="/signup">
+        <!-- Your signup form content goes here -->
+        <button type="submit" class="btn btn-primary">Sign Up</button>
+      </form>
+      <form method="get" action="/login">
+        <!-- Your login form content goes here -->
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  </body>
+</html>

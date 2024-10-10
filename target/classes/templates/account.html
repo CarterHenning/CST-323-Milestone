@@ -1,0 +1,96 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/mainTemplate">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Portfol.io</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+
+        a:link {
+            color: inherit;
+        }
+
+
+        a:visited {
+            color: inherit;
+        }
+
+
+        a:hover {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .gallery-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 70%;
+            border-radius: 20px;
+        }
+
+        .gallery-header {
+            font-size: 7em;
+        }
+
+        .card {
+            margin: 1rem;
+            width: 14vw;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card img {
+            height: 15vh;
+            object-fit: cover;
+        }
+
+        .card-body {
+           padding: 1vw;
+        }
+
+
+        .card-text {
+              font-size: 2em;  
+        }
+
+        .date {
+            font-size: 1em;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div layout:fragment="content" style="display: grid; place-items: center;">
+        <div class="gallery-header">
+            <div class="user-name" th:text="${name}"></div>
+        </div>
+        <div class="gallery-container">
+            <div class="card" th:each="postModel : ${posts}">
+                <a th:href="@{'/post/' + ${postModel.id}}">
+                    <img th:src="${postModel.imageUrl}" class="card-img-top" alt="Default Text">
+                    <div class="card-body">
+                        <h1 th:text="${postModel.title}" style="font-weight: 700;"></h1>
+                        <p class="card-text" th:text="${postModel.description}"></p>
+                        <div class="d-flex align-items-center">
+                            <small class="date" th:text="${postModel.date}"></small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

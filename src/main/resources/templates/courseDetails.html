@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/mainTemplate">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Course Details</title>
+    <style>
+        /* CSS for the hero banner */
+
+        /* Other styles for the details */
+        .card {
+            display: flex;
+            flex-direction: column;
+            margin: auto;
+            width: 60%;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #f9f9f9;
+        }
+
+        .card-image {
+            width: 100%;
+            max-height: 50vh;
+            object-fit: cover;
+        }
+
+        .text-content {
+            padding: 20px;
+        }
+
+        .buttons-container {
+            margin: 20px;
+            display: flex;
+            align-self: flex-end;
+            gap: 20px;
+        }
+
+        .hero-content {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .reviews-container
+        {
+            border-radius: 10px;
+            background-color: #272727;
+        }
+
+    </style>
+</head>
+<body>
+   <div layout:fragment="content">
+        <div class="hero-content">
+            <div style="width: 60%;">
+                <h1 th:text="${courseModel.title}" style="font-size: 7em;"></h1>
+                <p th:text="${courseModel.description}" style="font-size: 1.5em;"></p>
+            </div>
+            <div class="d-flex align-items-end">
+                <h1 th:text="${courseModel.rating} + ' / 10'" style="font-size: 7em;"></h1>
+            </div>
+        </div>
+
+        <div class="reviews-container">
+            <div class="card" th:each="reviewModel : ${reviews}">
+                <a th:href="@{'/review/' + ${reviewModel.id}}">
+                    <div class="card-body">
+                        <div style="display: flex; justify-content: space-between;">
+                            <div style="width: 80%;">
+                                <h1 th:text="${reviewModel.title}" style="font-weight: 700;"></h1>
+                                <p class="card-text" th:text="${reviewModel.description}"></p>
+                            </div>
+
+
+                            <div class="d-flex align-items-center">
+                                <h1 class="rating" th:text="${reviewModel.rating} + ' / 10'"></h1>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+
+        <div th:if="${courseModel == null}">
+            <p>Course not found</p>
+        </div>
+    </div>
+    </div> 
+</body>
+</html>
