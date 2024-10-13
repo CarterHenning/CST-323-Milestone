@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Portfol.io</title>
+	<title th:text="${title}"></title>
 
     <style>
         body {
@@ -14,6 +14,7 @@
 
         a {
             text-decoration: none;
+            color: white;
         }
 
 
@@ -32,26 +33,38 @@
             text-decoration: none;
         }
 
-        .gallery-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            width: 70%;
+        .container {
+            width: 100%;
+            padding-left: 5vw;
+            padding-right: 5vw;
+            box-sizing: border-box;
             border-radius: 20px;
         }
 
-        .gallery-header {
-            font-size: 7em;
+        .gallery-container {
+            display: grid;
+            margin: 10vh;
+        }
+
+        .user-container {
+            display: grid;
+            margin: 10vh;
         }
 
         .card {
             margin: 1rem;
-            width: 14vw;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #272727;
+            transition: background-color .5s ease, transform ease .5s;
+            transform: scale(1);
+        }
+
+        .card:hover {
+            background-color: #2d2d2d;
+            transform: scale(1.01);
         }
 
         .card img {
-            height: 15vh;
+            height: 25vh;
             object-fit: cover;
         }
 
@@ -61,36 +74,60 @@
 
 
         .card-text {
-              font-size: 2em;  
+              font-size: 1.2em;  
         }
 
-        .date {
-            font-size: 1em;
+        .rating {
+            font-size: 3em;
+        }
+
+        .extra-menu {
+            font-size: 3em;
+            vertical-align: baseline;
         }
 
     </style>
 </head>
 
 <body>
-    <div layout:fragment="content" style="display: grid; place-items: center;">
-        <div class="gallery-header">
-            <div class="user-name" th:text="${name}"></div>
+    <div layout:fragment="content">
+        <div class="user-container">
+            <h1 th:text="${user.username} + '\'s Reviews:'"></h1>
         </div>
+
         <div class="gallery-container">
-            <div class="card" th:each="postModel : ${posts}">
-                <a th:href="@{'/post/' + ${postModel.id}}">
-                    <img th:src="${postModel.imageUrl}" class="card-img-top" alt="Default Text">
-                    <div class="card-body">
-                        <h1 th:text="${postModel.title}" style="font-weight: 700;"></h1>
-                        <p class="card-text" th:text="${postModel.description}"></p>
+            <div class="card" th:each="ReviewModel : ${userReviews}">
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-between;">
+                        <div style="width: 80%;">
+                            <h1 th:text="${courses.get(ReviewModel.courseId - 1).title}" style="font-weight: 700;"></h1>
+                            <p class="card-text" th:text="${ReviewModel.description}"></p>
+                        </div>
+
+
                         <div class="d-flex align-items-center">
-                            <small class="date" th:text="${postModel.date}"></small>
+                            <h1 class="rating" th:text="${ReviewModel.rating} + ' / 10'"></h1>
+                        </div>
+                        <div class="d-flex align-items-center" id="test" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
+                                <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"/>
+                            </svg>
                         </div>
                     </div>
-                </a>
+                </div>
             </div>
         </div>
-    </div>
+
+        <!-- <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Dropdown button
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="#">Action</a>
+              <a class="dropdown-item" href="#">Another action</a>
+              <a class="dropdown-item" href="#">Something else here</a>
+            </div>
+        </div> -->
 </body>
 
 </html>
