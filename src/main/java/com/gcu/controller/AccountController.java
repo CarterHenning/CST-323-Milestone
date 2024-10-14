@@ -9,16 +9,23 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
+import com.gcu.business.CourseBusinessService;
 import com.gcu.business.CourseServiceInterface;
-import com.gcu.business.RegistrationService;
 import com.gcu.business.ReviewServiceInterface;
+import com.gcu.data.CoursesDataService;
 import com.gcu.data.UsersDataService;
 import com.gcu.data.entity.UserEntity;
 import com.gcu.model.CourseModel;
 import com.gcu.model.ReviewModel;
+
+import jakarta.validation.Valid;
 
 /**
  * Controller class for handling account-related requests.
@@ -26,9 +33,6 @@ import com.gcu.model.ReviewModel;
 @Controller
 @RequestMapping("/account")
 public class AccountController {
-
-	@Autowired
-	private RegistrationService rs;
 
 	@Autowired
 	private CourseServiceInterface service;
@@ -72,5 +76,44 @@ public class AccountController {
 		// Return view
 		return "account";
 	} // end showAccountPage
+	
+	@GetMapping("/review/{id}/edit")
+	public String showEditReviewPage(@PathVariable int id, Model model)
+	{
+		// Get review:
+		ReviewModel review = reviewService.getReviewById(id);
+		// Give review to model
+		model.addAttribute("review", review);
+		// Get course review was for
+		CourseModel course = service.getCourseById(review.getCourseId());
+		// Give course to model
+		model.addAttribute("course", course);
+		
+		// Give page's title to the model
+		model.addAttribute("title", "Edit Review");
+		// Return view
+		return "editReview";
+	}
+	
+	@PostMapping("/doEditReview")
+    public String doCreateReview(@Valid ReviewModel review, @SessionAttribute("userId") int userId, BindingResult bindingResult, Model model) {
+        try {
+                review.setUserId(userId);
+                
+                // Update review using the service
+                reviewService.updateReview(review, review.getReviewId());      
+                
+                int averageRating = reviewService.calculateAverageRating(review.getCourseId());
+        
+                service.updateCourseRating(review.getCourseId(), averageRating);
+
+                return "redirect:/account";
+
+        } catch (Exception e) {
+            // Handle any exceptions that might occur
+            
+            return "redirect:/account/" + review.getReviewId() + "/edit"; // Redirect back to the form
+        }
+    }
 
 } // end AccountController

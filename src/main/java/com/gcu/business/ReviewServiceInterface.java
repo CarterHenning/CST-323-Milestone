@@ -16,6 +16,8 @@ public interface ReviewServiceInterface
     public List<ReviewModel> getReviewsByCourseId(int courseId);
 
     public ReviewModel getReviewByUserId(int userId);
+    
+    public ReviewModel getReviewById(int reviewId);
 
     public boolean deleteReviews(int id);
 

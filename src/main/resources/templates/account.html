@@ -81,9 +81,15 @@
             font-size: 3em;
         }
 
-        .extra-menu {
-            font-size: 3em;
-            vertical-align: baseline;
+        .buttonContainer {
+            display: grid;
+            margin: 3vh;
+        }
+        
+        .buttons {
+            background-color: #272727;
+            margin: 0.5rem;
+            color: white;
         }
 
     </style>
@@ -104,30 +110,22 @@
                             <p class="card-text" th:text="${ReviewModel.description}"></p>
                         </div>
 
-
                         <div class="d-flex align-items-center">
                             <h1 class="rating" th:text="${ReviewModel.rating} + ' / 10'"></h1>
                         </div>
-                        <div class="d-flex align-items-center" id="test" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
-                                <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"/>
-                            </svg>
+                        <div class="buttonContainer">
+                            <a th:href="@{'/account/review/' + ${ReviewModel.reviewId} + '/edit'}">
+                                <button class="buttons">Edit</button>
+                            </a>
+                            <div>
+                                <button class="buttons">Delete</button>
+                            </div>
                         </div>
+
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Dropdown button
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <a class="dropdown-item" href="#">Action</a>
-              <a class="dropdown-item" href="#">Another action</a>
-              <a class="dropdown-item" href="#">Something else here</a>
-            </div>
-        </div> -->
 </body>
 
 </html>

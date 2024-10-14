@@ -81,6 +81,15 @@ public class ReviewBusinessService implements ReviewServiceInterface {
         }
         return null;
     }
+    
+    @Override
+    public ReviewModel getReviewById(int reviewId) {
+        ReviewEntity entity = service.findById(reviewId);
+        if (entity != null) {
+            return new ReviewModel(entity.getReviewId(), entity.getUserId(), entity.getCourseId(), entity.getRating(), entity.getDescription());
+        }
+        return null;
+    }
 
     @Override
     public boolean deleteReviews(int id) {
