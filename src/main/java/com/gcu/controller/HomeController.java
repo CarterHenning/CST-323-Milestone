@@ -35,8 +35,6 @@ import com.gcu.model.SignUpModel;
 
 import jakarta.validation.Valid;
 
-
-
 /**
  * Handles requests related to the home page, sign-up, login, and user sign-in.
  */
@@ -44,310 +42,304 @@ import jakarta.validation.Valid;
 @RequestMapping("/")
 public class HomeController {
 
-    @Autowired
-    private RegistrationService rs;
+	@Autowired
+	private RegistrationService rs;
 
-    @Autowired
-    private CourseServiceInterface service;
+	@Autowired
+	private CourseServiceInterface service;
 
-    @Autowired
-    private ReviewServiceInterface reviewService;
+	@Autowired
+	private ReviewServiceInterface reviewService;
 
-    @Autowired
-    private UsersDataService usersDataService;
+	@Autowired
+	private UsersDataService usersDataService;
 
-    /**
-     * Displays the home page with a list of course models.
-     *
-     * @param model   the Spring MVC model for rendering the view
-     * @param request the HTTP servlet request
-     * @return the view name for the home page
-     */
-    @GetMapping("/")
-    public String showHomePage(Model model, HttpServletRequest request) {
-    
+	/**
+	 * Displays the home page with a list of course models.
+	 *
+	 * @param model   the Spring MVC model for rendering the view
+	 * @param request the HTTP servlet request
+	 * @return the view name for the home page
+	 */
+	@GetMapping("/")
+	public String showHomePage(Model model, HttpServletRequest request) {
 
-        try 
-        {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            String username = userDetails.getUsername();
-            UserEntity user = usersDataService.findByUsername(username);
+		try {
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+			String username = userDetails.getUsername();
+			UserEntity user = usersDataService.findByUsername(username);
 
-            // Store user details in session
-            request.getSession().setAttribute("user", user);
+			// Store user details in session
+			request.getSession().setAttribute("user", user);
 
-            // Now you can get the user ID
-            int userId = user.getId();
+			// Now you can get the user ID
+			int userId = user.getId();
 
-            // Store user ID in session
-            request.getSession().setAttribute("userId", userId);
-        } catch (Exception e) 
-        {
-            // Handle the exception, e.g., log it or show a user-friendly error message
-            e.printStackTrace(); // Example: print the stack trace
-        }
-    
-        List<CourseModel> courses = service.getCourses();
-        model.addAttribute("courses", courses);
-        return "courses";
-    }
-    
-    /**
-     * Retrieves a list of courses from a service and adds them to the model for display.
-     *
-     * @param model the model to which course data and title will be added
-     * @return the name of the view to be rendered, in this case, "courses"
-     */
-    @GetMapping("/getcourses")
-	public String getCourses(Model model)
-	{
-        // get all courses
+			// Store user ID in session
+			request.getSession().setAttribute("userId", userId);
+		} catch (Exception e) {
+			// Handle the exception, e.g., log it or show a user-friendly error message
+			e.printStackTrace(); // Example: print the stack trace
+		}
+
 		List<CourseModel> courses = service.getCourses();
-        // pass courses in key value
-        model.addAttribute("title", "List of Courses");
 		model.addAttribute("courses", courses);
-        // return courses
 		return "courses";
 	}
 
-    /**
-     * Displays the 
-     * @param model Course Model for returned courses
-     * @param id grabs the id to search from the url
-     * @return courses html page
-     */
-    @GetMapping("/findcourse/{id}")
-    public String getCourse(@PathVariable("id") int id, Model model)
-    {
-        // get model by id
-        CourseModel course = service.getCourseById(id);
-
-        // pass course in key value pairs
-        model.addAttribute("title", "List of Courses");
-		model.addAttribute("courses", course);
-        // return
+	/**
+	 * Retrieves a list of courses from a service and adds them to the model for
+	 * display.
+	 *
+	 * @param model the model to which course data and title will be added
+	 * @return the name of the view to be rendered, in this case, "courses"
+	 */
+	@GetMapping("/getcourses")
+	public String getCourses(Model model) {
+		// get all courses
+		List<CourseModel> courses = service.getCourses();
+		// pass courses in key value
+		model.addAttribute("title", "List of Courses");
+		model.addAttribute("courses", courses);
+		// return courses
 		return "courses";
-    }
+	}
 
-    /**
-     * Displays the sign-up form view.
-     * @param model the Spring MVC model for rendering the view
-     * @return the view name for the sign-up page
-     */
-    @GetMapping("/signup")
-    public String showSignUpPage(Model model) 
-    {
-        // Display Sign Up Form View
-        model.addAttribute("title", "Sign Up Here!");
-        model.addAttribute("signUpModel", new SignUpModel(null, null, null));
-        return "signup";
-    }
+	/**
+	 * Displays the
+	 * 
+	 * @param model Course Model for returned courses
+	 * @param id    grabs the id to search from the url
+	 * @return courses html page
+	 */
+	@GetMapping("/findcourse/{id}")
+	public String getCourse(@PathVariable("id") int id, Model model) {
+		// get model by id
+		CourseModel course = service.getCourseById(id);
 
-    /**
-     * Handles the sign-up form submission.
-     *
-     * @param signUpModel   the model representing the sign-up form data
-     * @param bindingResult the Spring MVC binding result for validation
-     * @param model         the Spring MVC model for rendering the view
-     * @return the view name for redirection after sign-up
-     */
-    @PostMapping("/doSignUp")
-    public String doSignUp(@Valid SignUpModel signUpModel, BindingResult bindingResult, Model model) 
-    {
-        // check for validation errors 
-        if(bindingResult.hasErrors())
-        {
-            model.addAttribute("title", "Sign Up Here!");
-            return "signup";
-        }
+		// pass course in key value pairs
+		model.addAttribute("title", "List of Courses");
+		model.addAttribute("courses", course);
+		// return
+		return "courses";
+	}
 
-        // Utilize the Registration Service to initialize the user
-        int initializationResult = rs.initializeUser(signUpModel);
-        switch(initializationResult)
-        {
-            case 1:             // successful
-                // Authenticate the user after successful sign-up
-                return "redirect:/";
-            case -1:            // same username
-                model.addAttribute("title", "Username already taken!");
-                return "signup";
-            case -2:            // same email
-                model.addAttribute("title", "Email already taken!");
-                return "signup";
-            default:
-                model.addAttribute("title", "Error during sign-up!");
-                return "signup";
-        }        
-    }
+	/**
+	 * Displays the sign-up form view.
+	 * 
+	 * @param model the Spring MVC model for rendering the view
+	 * @return the view name for the sign-up page
+	 */
+	@GetMapping("/signup")
+	public String showSignUpPage(Model model) {
+		// Display Sign Up Form View
+		model.addAttribute("title", "Sign Up Here!");
+		model.addAttribute("signUpModel", new SignUpModel(null, null, null));
+		return "signup";
+	}
 
-     /**
-     * Displays the starter page for user sign-in.
-     * @param model the Spring MVC model for rendering the view
-     * @return the view name for the sign-in page
-     */
-    @GetMapping("/signIn")
-    public String showStarterPage(Model model) {
-        model.addAttribute("title", "RateMyCourse");
-        return "signIn";
-    }
-    
+	/**
+	 * Handles the sign-up form submission.
+	 *
+	 * @param signUpModel   the model representing the sign-up form data
+	 * @param bindingResult the Spring MVC binding result for validation
+	 * @param model         the Spring MVC model for rendering the view
+	 * @return the view name for redirection after sign-up
+	 */
+	@PostMapping("/doSignUp")
+	public String doSignUp(@Valid SignUpModel signUpModel, BindingResult bindingResult, Model model) {
+		// check for validation errors
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("title", "Sign Up Here!");
+			return "signup";
+		}
 
-    /**
-     * Processes the creation of a new course.
-     * @param courseModel      the course model containing the new course's data
-     * @param bindingResult  the binding result for validation errors
-     * @param model          the model to be populated with attributes
-     * @return the view template to redirect to, either the createCourse template if there are errors or the home page
-     */
-    @PostMapping("/doCreateCourse")
-    public String doCreateCourse(@Valid CourseModel courseModel, BindingResult bindingResult, Model model) 
-    {
-        if(bindingResult.hasErrors())
-        {
-            System.out.println("Validation errors:");
-            for (FieldError error : bindingResult.getFieldErrors()) {
-                System.out.println(error.getField() + ": " + error.getDefaultMessage());
-            }
-            model.addAttribute("title", "Create Course Here!");
-            return "createCourse";
-        }        
-        // Save the new course
-        service.createCourse(courseModel);
+		// Utilize the Registration Service to initialize the user
+		int initializationResult = rs.initializeUser(signUpModel);
+		switch (initializationResult) {
+		case 1: // successful
+			// Authenticate the user after successful sign-up
+			return "redirect:/";
+		case -1: // same username
+			model.addAttribute("title", "Username already taken!");
+			return "signup";
+		case -2: // same email
+			model.addAttribute("title", "Email already taken!");
+			return "signup";
+		default:
+			model.addAttribute("title", "Error during sign-up!");
+			return "signup";
+		}
+	}
 
-        // Get all courses including the newly added one
-        List<CourseModel> courses = service.getCourses();
-        
-        model.addAttribute("courses", courses);
+	/**
+	 * Displays the starter page for user sign-in.
+	 * 
+	 * @param model the Spring MVC model for rendering the view
+	 * @return the view name for the sign-in page
+	 */
+	@GetMapping("/signIn")
+	public String showStarterPage(Model model) {
+		model.addAttribute("title", "RateMyCourse");
+		return "signIn";
+	}
 
-        return "redirect:/";
-    }
+	/**
+	 * Processes the creation of a new course.
+	 * 
+	 * @param courseModel   the course model containing the new course's data
+	 * @param bindingResult the binding result for validation errors
+	 * @param model         the model to be populated with attributes
+	 * @return the view template to redirect to, either the createCourse template if
+	 *         there are errors or the home page
+	 */
+	@PostMapping("/doCreateCourse")
+	public String doCreateCourse(@Valid CourseModel courseModel, BindingResult bindingResult, Model model) {
+		if (bindingResult.hasErrors()) {
+			System.out.println("Validation errors:");
+			for (FieldError error : bindingResult.getFieldErrors()) {
+				System.out.println(error.getField() + ": " + error.getDefaultMessage());
+			}
+			model.addAttribute("title", "Create Course Here!");
+			return "createCourse";
+		}
+		// Save the new course
+		service.createCourse(courseModel);
 
+		// Get all courses including the newly added one
+		List<CourseModel> courses = service.getCourses();
 
-    /**
-     * Retrieves details of a specific course by its ID.
-     *
-     * @param id    The ID of the course to retrieve details for.
-     * @param model The model to which course details will be added.
-     * @return The view name for displaying course details.
-     */
-    @GetMapping("/course/{id}")
-    public String showCourseDetails(@PathVariable int id, Model model) {
-        // Logic to retrieve the course details by id
-        CourseModel course = service.getCourseById(id);
-        List<ReviewModel> reviews = reviewService.getReviewsByCourseId(id);
-        model.addAttribute("courseModel", course);
-        model.addAttribute("reviews", reviews);
-        
-        return "courseDetails";
-    }
+		model.addAttribute("courses", courses);
 
+		return "redirect:/";
+	}
 
+	/**
+	 * Retrieves details of a specific course by its ID.
+	 *
+	 * @param id    The ID of the course to retrieve details for.
+	 * @param model The model to which course details will be added.
+	 * @return The view name for displaying course details.
+	 */
+	@GetMapping("/course/{id}")
+	public String showCourseDetails(@PathVariable int id, Model model) {
+		// Logic to retrieve the course details by id
+		CourseModel course = service.getCourseById(id);
+		List<ReviewModel> reviews = reviewService.getReviewsByCourseId(id);
+		model.addAttribute("courseModel", course);
+		model.addAttribute("reviews", reviews);
 
-    /**
-     * Deletes a course based on its ID.
-     *
-     * @param id The ID of the course to delete.
-     * @return Redirects to the home page after deletion.
-     */
-    @PostMapping("/course/delete/{id}")
-        public String deleteCourse(@PathVariable int id) {
-        service.deleteCourse(id);
-        return "redirect:/";
-    }
+		// Get user details:
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+		String username = userDetails.getUsername();
+		UserEntity user = usersDataService.findByUsername(username);
+		model.addAttribute("user", user);
 
-    /**
-     * Prepares the update form for a specific course.
-     *
-     * @param id    The ID of the course to update.
-     * @param model The model to which course details will be updated.
-     * @return The view name for updating the course.
-     */
-    @PostMapping("/course/update/{id}")
-    public String updateCourse(@PathVariable int id, Model model) {
-        CourseModel course = service.getCourseById(id);
-        model.addAttribute("courseModel", course);
-        return "updateCourse";
-    }
+		return "courseDetails";
+	}
 
-    /**
-     * Performs the update operation for a course.
-     *
-     * @param id     grabbing from the url path
-     * @param courseModel     The updated course model.
-     * @param bindingResult The result of the validation.
-     * @param model         The model to which attributes will be updated.
-     * @return Redirects to the home page after updating the course.
-     */
-    @PostMapping("/course/update/doUpdate/{id}")
-    public String doUpdateCourse(@PathVariable int id, @Valid CourseModel courseModel, BindingResult bindingResult, Model model) {
-        if (bindingResult.hasErrors()) {
-            System.out.println("Validation errors:");
-            for (FieldError error : bindingResult.getFieldErrors()) {
-                System.out.println(error.getField() + ": " + error.getDefaultMessage());
-            }
-            model.addAttribute("title", "Update Course Here!");
-            return "updateCourse";
-        }
+	/**
+	 * Deletes a course based on its ID.
+	 *
+	 * @param id The ID of the course to delete.
+	 * @return Redirects to the home page after deletion.
+	 */
+	@PostMapping("/course/delete/{id}")
+	public String deleteCourse(@PathVariable int id) {
+		service.deleteCourse(id);
+		return "redirect:/";
+	}
 
-        // updates course
-        service.updateCourse(courseModel, id);
+	/**
+	 * Prepares the update form for a specific course.
+	 *
+	 * @param id    The ID of the course to update.
+	 * @param model The model to which course details will be updated.
+	 * @return The view name for updating the course.
+	 */
+	@PostMapping("/course/update/{id}")
+	public String updateCourse(@PathVariable int id, Model model) {
+		CourseModel course = service.getCourseById(id);
+		model.addAttribute("courseModel", course);
+		return "updateCourse";
+	}
 
-        // Get all courses including the updated one
-        List<CourseModel> courses = service.getCourses();
+	/**
+	 * Performs the update operation for a course.
+	 *
+	 * @param id            grabbing from the url path
+	 * @param courseModel   The updated course model.
+	 * @param bindingResult The result of the validation.
+	 * @param model         The model to which attributes will be updated.
+	 * @return Redirects to the home page after updating the course.
+	 */
+	@PostMapping("/course/update/doUpdate/{id}")
+	public String doUpdateCourse(@PathVariable int id, @Valid CourseModel courseModel, BindingResult bindingResult,
+			Model model) {
+		if (bindingResult.hasErrors()) {
+			System.out.println("Validation errors:");
+			for (FieldError error : bindingResult.getFieldErrors()) {
+				System.out.println(error.getField() + ": " + error.getDefaultMessage());
+			}
+			model.addAttribute("title", "Update Course Here!");
+			return "updateCourse";
+		}
 
-        model.addAttribute("courses", courses);
+		// updates course
+		service.updateCourse(courseModel, id);
 
-        return "redirect:/";
-    }
+		// Get all courses including the updated one
+		List<CourseModel> courses = service.getCourses();
 
+		model.addAttribute("courses", courses);
 
+		return "redirect:/";
+	}
 
+	@GetMapping("/addReview/{courseId}")
+	public String showAddReviewForm(@PathVariable("courseId") int courseId, Model model, HttpServletRequest request) {
+		// Retrieve the course by ID
+		CourseModel course = service.getCourseById(courseId);
 
+		// Retrieve the user ID from the session
+		Integer userId = (Integer) request.getSession().getAttribute("userId");
 
-    @GetMapping("/addReview/{courseId}")
-    public String showAddReviewForm(@PathVariable("courseId") int courseId, Model model, HttpServletRequest request) {
-        // Retrieve the course by ID
-        CourseModel course = service.getCourseById(courseId);
-        
-        // Retrieve the user ID from the session
-        Integer userId = (Integer) request.getSession().getAttribute("userId");
+		// Create a new ReviewModel and set courseId and userId
+		ReviewModel review = new ReviewModel();
+		review.setCourseId(courseId);
+		if (userId != null) {
+			review.setUserId(userId); // Set user ID only if available
+		}
 
-        // Create a new ReviewModel and set courseId and userId
-        ReviewModel review = new ReviewModel();
-        review.setCourseId(courseId);
-        if (userId != null) {
-            review.setUserId(userId); // Set user ID only if available
-        }
+		// Add the necessary attributes to the model
+		model.addAttribute("courseModel", course);
+		model.addAttribute("reviewModel", review);
 
-        // Add the necessary attributes to the model
-        model.addAttribute("courseModel", course);
-        model.addAttribute("reviewModel", review);
+		// Return the name of the Thymeleaf template (e.g., addUserReview.html)
+		return "addUserReview";
+	}
 
-        // Return the name of the Thymeleaf template (e.g., addUserReview.html)
-        return "addUserReview";
-    }
+	@PostMapping("/doCreateReview")
+	public String doCreateReview(@Valid ReviewModel reviewModel, @SessionAttribute("userId") int userId,
+			BindingResult bindingResult, Model model) {
+		try {
+			reviewModel.setUserId(userId);
 
-    @PostMapping("/doCreateReview")
-    public String doCreateReview(@Valid ReviewModel reviewModel, @SessionAttribute("userId") int userId, BindingResult bindingResult, Model model) {
-        try {
-                reviewModel.setUserId(userId);
+			// Save the review using the service
+			reviewService.createReview(reviewModel);
 
-                // Save the review using the service
-                reviewService.createReview(reviewModel);
+			int averageRating = reviewService.calculateAverageRating(reviewModel.getCourseId());
 
-                int averageRating = reviewService.calculateAverageRating(reviewModel.getCourseId());
+			service.updateCourseRating(reviewModel.getCourseId(), averageRating);
 
-        
-                service.updateCourseRating(reviewModel.getCourseId(), averageRating);
+			return "redirect:/course/" + reviewModel.getCourseId();
 
-                return "redirect:/course/" + reviewModel.getCourseId();
+		} catch (Exception e) {
+			// Handle any exceptions that might occur
 
-        } catch (Exception e) {
-            // Handle any exceptions that might occur
-            
-            return "redirect:/addReview/" + reviewModel.getCourseId(); // Redirect back to the form
-        }
-    }
-}   
-
+			return "redirect:/addReview/" + reviewModel.getCourseId(); // Redirect back to the form
+		}
+	}
+}
