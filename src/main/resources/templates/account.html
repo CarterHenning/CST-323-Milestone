@@ -117,9 +117,9 @@
                             <a th:href="@{'/account/review/' + ${ReviewModel.reviewId} + '/edit'}">
                                 <button class="buttons">Edit</button>
                             </a>
-                            <div>
+                            <a th:href="@{'/account/doDeleteReview/' + ${ReviewModel.reviewId}}">
                                 <button class="buttons">Delete</button>
-                            </div>
+                            </a>
                         </div>
 
                     </div>

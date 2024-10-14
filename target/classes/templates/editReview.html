@@ -80,9 +80,8 @@
 <body>
     <div layout:fragment="content">
 
-        <h1>Edit Review</h1>
         <div style="display: grid; place-items: center;">
-            <h1 th:text="'Edit a Review for ' + ${course.title}"></h1>
+            <h1 th:text="'Edit Review for ' + ${course.title}"></h1>
         </div>
         <div class="container">
             <form action="#" th:action="@{/account/doEditReview}" th:object="${review}" method="post">
