@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,8 @@ public class CoursesDataService implements DataAccessInterface<CourseEntity> {
 
     @Autowired
     private CourseRepository courseRepository;
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Constructs a new CoursesDataService with the given CourseRepository.
@@ -37,6 +41,7 @@ public class CoursesDataService implements DataAccessInterface<CourseEntity> {
      */
     @Override
     public List<CourseEntity> findAll() {
+        logger.info("Entering findAll()");
         List<CourseEntity> courses = new ArrayList<>();
         try {
             Iterable<CourseEntity> coursesIterable = courseRepository.findAll();
@@ -45,6 +50,7 @@ public class CoursesDataService implements DataAccessInterface<CourseEntity> {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        logger.info("Exiting findAll()");
         return courses;
     }
 
@@ -56,12 +62,15 @@ public class CoursesDataService implements DataAccessInterface<CourseEntity> {
      */
     @Override
     public boolean create(CourseEntity course) {
+        logger.info("Entering create()");
         try {
             this.courseRepository.save(course);
         } catch (Exception e) {
             e.printStackTrace();
+            logger.info("Exiting create()");
             return false;
         }
+        logger.info("Exiting create()");
         return true;
     }
 
@@ -73,6 +82,8 @@ public class CoursesDataService implements DataAccessInterface<CourseEntity> {
      */
     @Override
     public CourseEntity findById(int id) {
+        logger.info("Entering findById()");
+        logger.info("Exiting findById()");
         return this.courseRepository.findById(id).orElse(null);
     }
 
@@ -84,12 +95,15 @@ public class CoursesDataService implements DataAccessInterface<CourseEntity> {
      */
     @Override
     public boolean update(CourseEntity course) {
+        logger.info("Entering update()");
         try {
             this.courseRepository.save(course);
         } catch (Exception e) {
             e.printStackTrace();
+            logger.info("Exiting update()");
             return false;
         }
+        logger.info("Exiting update()");
         return true;
     }
 
@@ -101,12 +115,15 @@ public class CoursesDataService implements DataAccessInterface<CourseEntity> {
      */
     @Override
     public boolean delete(int id) {
+        logger.info("Entering delete()");
         try {
             this.courseRepository.deleteById(id);
         } catch (Exception e) {
             e.printStackTrace();
+            logger.info("Exiting delete()");
             return false;
         }
+        logger.info("Exiting delete()");
         return true;
     }
 

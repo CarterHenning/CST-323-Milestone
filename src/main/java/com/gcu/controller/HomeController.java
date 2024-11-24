@@ -3,6 +3,8 @@ package com.gcu.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -54,6 +56,8 @@ public class HomeController {
 	@Autowired
 	private UsersDataService usersDataService;
 
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	/**
 	 * Displays the home page with a list of course models.
 	 *
@@ -63,6 +67,7 @@ public class HomeController {
 	 */
 	@GetMapping("/")
 	public String showHomePage(Model model, HttpServletRequest request) {
+		logger.info("Entering showHomePage()");
 
 		try {
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -79,12 +84,14 @@ public class HomeController {
 			// Store user ID in session
 			request.getSession().setAttribute("userId", userId);
 		} catch (Exception e) {
+			logger.info("Exiting showHomePage() with an error");
 			// Handle the exception, e.g., log it or show a user-friendly error message
 			e.printStackTrace(); // Example: print the stack trace
 		}
 
 		List<CourseModel> courses = service.getCourses();
 		model.addAttribute("courses", courses);
+		logger.info("Exiting showHomePage()");
 		return "courses";
 	}
 
@@ -97,12 +104,14 @@ public class HomeController {
 	 */
 	@GetMapping("/getcourses")
 	public String getCourses(Model model) {
+		logger.info("Entering getCourses()");
 		// get all courses
 		List<CourseModel> courses = service.getCourses();
 		// pass courses in key value
 		model.addAttribute("title", "List of Courses");
 		model.addAttribute("courses", courses);
 		// return courses
+		logger.info("Exiting getCourses()");
 		return "courses";
 	}
 
@@ -115,6 +124,7 @@ public class HomeController {
 	 */
 	@GetMapping("/findcourse/{id}")
 	public String getCourse(@PathVariable("id") int id, Model model) {
+		logger.info("Entering getCourse()");
 		// get model by id
 		CourseModel course = service.getCourseById(id);
 
@@ -122,6 +132,7 @@ public class HomeController {
 		model.addAttribute("title", "List of Courses");
 		model.addAttribute("courses", course);
 		// return
+		logger.info("Exiting getCourse()");
 		return "courses";
 	}
 
@@ -133,9 +144,11 @@ public class HomeController {
 	 */
 	@GetMapping("/signup")
 	public String showSignUpPage(Model model) {
+		logger.info("Entering showSignUpPage()");
 		// Display Sign Up Form View
 		model.addAttribute("title", "Sign Up Here!");
 		model.addAttribute("signUpModel", new SignUpModel(null, null, null));
+		logger.info("Exiting showSignUpPage()");
 		return "signup";
 	}
 
@@ -152,24 +165,29 @@ public class HomeController {
 		// check for validation errors
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("title", "Sign Up Here!");
+			logger.info("Exiting doSignUp()");
 			return "signup";
 		}
 
 		// Utilize the Registration Service to initialize the user
 		int initializationResult = rs.initializeUser(signUpModel);
 		switch (initializationResult) {
-		case 1: // successful
-			// Authenticate the user after successful sign-up
-			return "redirect:/";
-		case -1: // same username
-			model.addAttribute("title", "Username already taken!");
-			return "signup";
-		case -2: // same email
-			model.addAttribute("title", "Email already taken!");
-			return "signup";
-		default:
-			model.addAttribute("title", "Error during sign-up!");
-			return "signup";
+			case 1: // successful
+				// Authenticate the user after successful sign-up
+				logger.info("Exiting doSignUp()");
+				return "redirect:/";
+			case -1: // same username
+				model.addAttribute("title", "Username already taken!");
+				logger.info("Exiting doSignUp()");
+				return "signup";
+			case -2: // same email
+				model.addAttribute("title", "Email already taken!");
+				logger.info("Exiting doSignUp()");
+				return "signup";
+			default:
+				model.addAttribute("title", "Error during sign-up!");
+				logger.info("Exiting doSignUp()");
+				return "signup";
 		}
 	}
 
@@ -181,7 +199,9 @@ public class HomeController {
 	 */
 	@GetMapping("/signIn")
 	public String showStarterPage(Model model) {
+		logger.info("Entering showStarterPage()");
 		model.addAttribute("title", "RateMyCourse");
+		logger.info("Exiting showStarterPage()");
 		return "signIn";
 	}
 
@@ -196,12 +216,14 @@ public class HomeController {
 	 */
 	@PostMapping("/doCreateCourse")
 	public String doCreateCourse(@Valid CourseModel courseModel, BindingResult bindingResult, Model model) {
+		logger.info("Entering doCreateCourse()");
 		if (bindingResult.hasErrors()) {
 			System.out.println("Validation errors:");
 			for (FieldError error : bindingResult.getFieldErrors()) {
 				System.out.println(error.getField() + ": " + error.getDefaultMessage());
 			}
 			model.addAttribute("title", "Create Course Here!");
+			logger.info("Exiting doCreateCourse()");
 			return "createCourse";
 		}
 		// Save the new course
@@ -212,6 +234,7 @@ public class HomeController {
 
 		model.addAttribute("courses", courses);
 
+		logger.info("Exiting doCreateCourse()");
 		return "redirect:/";
 	}
 
@@ -224,6 +247,7 @@ public class HomeController {
 	 */
 	@GetMapping("/course/{id}")
 	public String showCourseDetails(@PathVariable int id, Model model) {
+		logger.info("Entering showCourseDetails()");
 		// Logic to retrieve the course details by id
 		CourseModel course = service.getCourseById(id);
 		List<ReviewModel> reviews = reviewService.getReviewsByCourseId(id);
@@ -237,6 +261,7 @@ public class HomeController {
 		UserEntity user = usersDataService.findByUsername(username);
 		model.addAttribute("user", user);
 
+		logger.info("Exiting showCourseDetails()");
 		return "courseDetails";
 	}
 
@@ -248,7 +273,9 @@ public class HomeController {
 	 */
 	@PostMapping("/course/delete/{id}")
 	public String deleteCourse(@PathVariable int id) {
+		logger.info("Entering deleteCourse()");
 		service.deleteCourse(id);
+		logger.info("Exiting deleteCourse()");
 		return "redirect:/";
 	}
 
@@ -261,8 +288,10 @@ public class HomeController {
 	 */
 	@PostMapping("/course/update/{id}")
 	public String updateCourse(@PathVariable int id, Model model) {
+		logger.info("Entering updateCourse()");
 		CourseModel course = service.getCourseById(id);
 		model.addAttribute("courseModel", course);
+		logger.info("Exiting updateCourse()");
 		return "updateCourse";
 	}
 
@@ -278,12 +307,15 @@ public class HomeController {
 	@PostMapping("/course/update/doUpdate/{id}")
 	public String doUpdateCourse(@PathVariable int id, @Valid CourseModel courseModel, BindingResult bindingResult,
 			Model model) {
+
+		logger.info("Entering doUpdateCourse()");
 		if (bindingResult.hasErrors()) {
 			System.out.println("Validation errors:");
 			for (FieldError error : bindingResult.getFieldErrors()) {
 				System.out.println(error.getField() + ": " + error.getDefaultMessage());
 			}
 			model.addAttribute("title", "Update Course Here!");
+			logger.info("Exiting doUpdateCourse()");
 			return "updateCourse";
 		}
 
@@ -295,11 +327,13 @@ public class HomeController {
 
 		model.addAttribute("courses", courses);
 
+		logger.info("Exiting doUpdateCourse()");
 		return "redirect:/";
 	}
 
 	@GetMapping("/addReview/{courseId}")
 	public String showAddReviewForm(@PathVariable("courseId") int courseId, Model model, HttpServletRequest request) {
+		logger.info("Entering showAddReviewForm()");
 		// Retrieve the course by ID
 		CourseModel course = service.getCourseById(courseId);
 
@@ -318,27 +352,32 @@ public class HomeController {
 		model.addAttribute("reviewModel", review);
 
 		// Return the name of the Thymeleaf template (e.g., addUserReview.html)
+		logger.info("Exiting showAddReviewForm()");
 		return "addUserReview";
 	}
 
 	@PostMapping("/doCreateReview")
 	public String doCreateReview(@Valid ReviewModel reviewModel, @SessionAttribute("userId") int userId,
 			BindingResult bindingResult, Model model) {
+
+		logger.info("Entering doCreateReview()");
 		try {
 			reviewModel.setUserId(userId);
-
+			
 			// Save the review using the service
 			reviewService.createReview(reviewModel);
-
+			
 			int averageRating = reviewService.calculateAverageRating(reviewModel.getCourseId());
-
+			
 			service.updateCourseRating(reviewModel.getCourseId(), averageRating);
 
+			logger.info("Exiting doCreateReview()");
 			return "redirect:/course/" + reviewModel.getCourseId();
-
+			
 		} catch (Exception e) {
 			// Handle any exceptions that might occur
-
+			
+			logger.info("Exiting doCreateReview()");
 			return "redirect:/addReview/" + reviewModel.getCourseId(); // Redirect back to the form
 		}
 	}

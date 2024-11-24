@@ -2,6 +2,8 @@ package com.gcu.api;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,6 +26,8 @@ public class CoursesRestService {
 	
     @Autowired
 	private CourseServiceInterface service;
+
+    private final Logger logger = LoggerFactory.getLogger(CoursesRestService.class);
 	
 	
     /**
@@ -35,6 +39,8 @@ public class CoursesRestService {
 			MediaType.APPLICATION_XML_VALUE})
 	public List<CourseModel> getCourses()
 	{
+        logger.info("Entering getCourses()");
+        logger.info("Exiting getCourses()");
 		return service.getCourses();
 	}
 	
@@ -47,15 +53,19 @@ public class CoursesRestService {
      */
     @GetMapping("/getCourse/{id}")
     public ResponseEntity<CourseModel> getCourses(@PathVariable("id") int id) {
+        logger.info("Entering getCourses()");
         try {
             CourseModel course = service.getCourseById(id);
             if (course == null) {
+                logger.info("Exiting getCourses()");
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
             } else {
+                logger.info("Exiting getCourses()");
             	return new ResponseEntity<>(course, HttpStatus.OK);             
             }
         } catch (Exception e) {
             // Catch any exception and return with HttpStatus.INTERNAL_SERVER_ERROR
+            logger.info("Exiting getCourses()");
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

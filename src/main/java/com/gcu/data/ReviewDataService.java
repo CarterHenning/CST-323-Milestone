@@ -3,6 +3,8 @@ package com.gcu.data;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,8 @@ public class ReviewDataService implements DataAccessInterface<ReviewEntity> {
 
     @Autowired
     private ReviewRepository reviewRepository;
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Constructs a new ReviewDataService with the given ReviewRepository.
@@ -34,6 +38,7 @@ public class ReviewDataService implements DataAccessInterface<ReviewEntity> {
      */
     @Override
     public List<ReviewEntity> findAll() {
+        logger.info("Entering findAll()");
         List<ReviewEntity> reviews = new ArrayList<>();
         try {
             Iterable<ReviewEntity> reviewsIterable = reviewRepository.findAll();
@@ -42,6 +47,7 @@ public class ReviewDataService implements DataAccessInterface<ReviewEntity> {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        logger.info("Exiting findAll()");
         return reviews;
     }
 
@@ -53,12 +59,15 @@ public class ReviewDataService implements DataAccessInterface<ReviewEntity> {
      */
     @Override
     public boolean create(ReviewEntity review) {
+        logger.info("Entering create()");
         try {
             this.reviewRepository.save(review);
         } catch (Exception e) {
             e.printStackTrace();
+            logger.info("Exiting create()");
             return false;
         }
+        logger.info("Exiting create()");
         return true;
     }
 
@@ -70,6 +79,8 @@ public class ReviewDataService implements DataAccessInterface<ReviewEntity> {
      */
     @Override
     public ReviewEntity findById(int id) {
+        logger.info("Entering findById()");
+        logger.info("Exiting findById()");
         return this.reviewRepository.findById(id).orElse(null);
     }
 
@@ -81,12 +92,15 @@ public class ReviewDataService implements DataAccessInterface<ReviewEntity> {
      */
     @Override
     public boolean update(ReviewEntity review) {
+        logger.info("Entering update()");
         try {
             this.reviewRepository.save(review);
         } catch (Exception e) {
             e.printStackTrace();
+            logger.info("Exiting update()");
             return false;
         }
+        logger.info("Exiting update()");
         return true;
     }
 
@@ -98,12 +112,15 @@ public class ReviewDataService implements DataAccessInterface<ReviewEntity> {
      */
     @Override
     public boolean delete(int id) {
+        logger.info("Entering delete()");
         try {
             this.reviewRepository.deleteById(id);
         } catch (Exception e) {
             e.printStackTrace();
+            logger.info("Exiting delete()");
             return false;
         }
+        logger.info("Exiting delete()");
         return true;
     }
 
@@ -114,9 +131,11 @@ public class ReviewDataService implements DataAccessInterface<ReviewEntity> {
      * @return A list of reviews for the specified course.
      */
     public List<ReviewEntity> findByCourseId(int courseId) {
+        logger.info("Entering findByCourseId()");
+        logger.info("Exiting findByCourseId()");
         return this.reviewRepository.findByCourseId(courseId);
     }
-
+    
     /**
      * Finds a review by user ID.
      * 
@@ -124,6 +143,8 @@ public class ReviewDataService implements DataAccessInterface<ReviewEntity> {
      * @return The review of the specified user.
      */
     public ReviewEntity findByUserId(int userId) {
+        logger.info("Entering findByUserId()");
+        logger.info("Exiting findByUserId()");
         return this.reviewRepository.findByUserId(userId);
     }
 }

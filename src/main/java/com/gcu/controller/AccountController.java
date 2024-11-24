@@ -3,6 +3,8 @@ package com.gcu.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,6 +37,8 @@ public class AccountController {
 	@Autowired
 	private UsersDataService usersDataService;
 
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	/**
 	 * Shows the current user's account page
 	 * 
@@ -43,18 +47,19 @@ public class AccountController {
 	 */
 	@GetMapping("")
 	public String showAccountPage(Model model) {
+        logger.info("Entering showAccountPage()");
 		// Get current User
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 		String username = userDetails.getUsername();
 		UserEntity user = usersDataService.findByUsername(username);
 		model.addAttribute("user", user);
-
+		
 		// Get all courses
 		List<CourseModel> courses = service.getCourses();
 		// To save user's reviews
 		List<ReviewModel> userReviews = new ArrayList<ReviewModel>();
-
+		
 		// Get all user's reviews
 		for (CourseModel course : courses) {
 			for (ReviewModel review : reviewService.getReviewsByCourseId(course.getId())) {
@@ -71,6 +76,7 @@ public class AccountController {
 		// Give page's title to the model
 		model.addAttribute("title", "Account");
 		// Return view
+		logger.info("Exiting showAccountPage()");
 		return "account";
 	} // end showAccountPage
 
@@ -83,6 +89,7 @@ public class AccountController {
 	 */
 	@GetMapping("/review/{id}/edit")
 	public String showEditReviewPage(@PathVariable int id, Model model) {
+        logger.info("Entering showEditReviewPage()");
 		// Get review:
 		ReviewModel review = reviewService.getReviewById(id);
 		// Give review to model
@@ -91,10 +98,11 @@ public class AccountController {
 		CourseModel course = service.getCourseById(review.getCourseId());
 		// Give course to model
 		model.addAttribute("course", course);
-
+		
 		// Give page's title to the model
 		model.addAttribute("title", "Edit Review");
 		// Return view
+        logger.info("Exiting showEditReviewPage()");
 		return "editReview";
 	}
 
@@ -107,20 +115,23 @@ public class AccountController {
 	 */
 	@PostMapping("/doEditReview")
 	public String doEditReview(@Valid ReviewModel review, Model model) {
+        logger.info("Entering doEditReview()");
 		try {
 			// Update review using the service
 			reviewService.updateReview(review, review.getReviewId());
-
+			
 			// Update the average course rating now that there was a new review
 			int averageRating = reviewService.calculateAverageRating(review.getCourseId());
-
+			
 			service.updateCourseRating(review.getCourseId(), averageRating);
-
+			
+			logger.info("Exiting doEditReview()");
 			return "redirect:/account";
-
+			
 		} catch (Exception e) {
 			// Handle any exceptions that might occur
 
+			logger.info("Exiting doEditReview()");
 			return "redirect:/account/" + review.getReviewId() + "/edit"; // Redirect back to the form
 		}
 	}
@@ -134,6 +145,7 @@ public class AccountController {
 	 */
 	@GetMapping("/doDeleteReview/{id}")
 	public String doDeleteReview(@PathVariable int id, Model model) {
+        logger.info("Entering doDeleteReview()");
 		try {
 			reviewService.deleteReviews(id);
 
@@ -143,12 +155,14 @@ public class AccountController {
 				int averageRating = reviewService.calculateAverageRating(course.getId());
 				service.updateCourseRating(course.getId(), averageRating);
 			}
-
+			
+			logger.info("Exiting doDeleteReview()");
 			return "redirect:/account";
-
+			
 		} catch (Exception e) {
 			// Handle any exceptions that might occur
-
+			
+			logger.info("Exiting doDeleteReview()");
 			return "redirect:/account"; // Redirect back to the account page
 		}
 	}

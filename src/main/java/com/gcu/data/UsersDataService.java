@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -25,6 +27,8 @@ public class UsersDataService implements DataAccessInterface<SignUpModel>, Users
     private DataSource dataSource;
     private JdbcTemplate jdbcTemplateObject;
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     /**
      * Constructor to set the data source and initialize the JDBC template.
      * 
@@ -44,6 +48,7 @@ public class UsersDataService implements DataAccessInterface<SignUpModel>, Users
      */
     @Override
     public List<SignUpModel> findAll() {
+        logger.info("Entering findAll()");
         String sql = "SELECT * FROM users"; // Correct table name
         // Perform database query to fetch users
         List<SignUpModel> users = new ArrayList<>();
@@ -51,14 +56,15 @@ public class UsersDataService implements DataAccessInterface<SignUpModel>, Users
             SqlRowSet srs = jdbcTemplateObject.queryForRowSet(sql);
             while (srs.next()) {
                 users.add(new SignUpModel(srs.getString("email"),
-                        srs.getString("userName"),
-                        srs.getString("password")));
+                srs.getString("userName"),
+                srs.getString("password")));
             }
         } catch (Exception e) {
             e.printStackTrace(); // For now, just print stack trace
         }
-
+        
         // Populate users list from database
+        logger.info("Exiting findAll()");
         return users;
     }
 
@@ -71,6 +77,8 @@ public class UsersDataService implements DataAccessInterface<SignUpModel>, Users
     @Override
     public SignUpModel findById(int id) {
         // Implement logic to find user by id from the database
+        logger.info("Entering findById()");
+        logger.info("Exiting findById()");
         return null;
     }
 
@@ -82,13 +90,16 @@ public class UsersDataService implements DataAccessInterface<SignUpModel>, Users
      */
     @Override
     public boolean create(SignUpModel user) {
+        logger.info("Entering create()");
         String sql = "INSERT INTO users(EMAIL, USERNAME, PASSWORD) VALUES(?, ?, ?)";
         try {
             int rows = jdbcTemplateObject.update(sql, user.getEmail(),user.getUserName(), user.getPassword());
+            logger.info("Exiting create()");
             return rows == 1 ? true : false;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        logger.info("Exiting create()");
         return false;
     }
 
@@ -100,10 +111,12 @@ public class UsersDataService implements DataAccessInterface<SignUpModel>, Users
      */
     @Override
     public boolean update(SignUpModel user) {
+        logger.info("Entering update()");
         // Implement logic to update a user in the database
         // Example:
         String sql = "UPDATE users SET userName=?, email=? WHERE id=?";
         int updatedRows = jdbcTemplateObject.update(sql, user.getUserName(), user.getEmail());
+        logger.info("Exiting update()");
         return updatedRows > 0;
     }
 
@@ -115,7 +128,9 @@ public class UsersDataService implements DataAccessInterface<SignUpModel>, Users
      */
     @Override
     public boolean delete(int id) {
+        logger.info("Entering delete()");
         // Implement logic to delete a user from the database
+        logger.info("Exiting delete()");
         return false;
     }
 
@@ -127,6 +142,8 @@ public class UsersDataService implements DataAccessInterface<SignUpModel>, Users
      */
     @Override
     public UserEntity findByUsername(String userName) {
+        logger.info("Entering findByUsername()");
+        logger.info("Exiting findByUsername()");
         return usersRepository.findByUserName(userName);
     }
 }

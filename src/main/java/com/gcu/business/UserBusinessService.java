@@ -3,6 +3,8 @@ package com.gcu.business;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,6 +30,8 @@ public class UserBusinessService implements UserDetailsService {
 	 */
     private final UsersDataService service;
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     /**
      * Constructs a new UserBusinessService with the provided UsersDataService.
      *
@@ -50,14 +54,17 @@ public class UserBusinessService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+        logger.info("Entering loadUserByUsername()");
         UserEntity user = service.findByUsername(userName);
-
+        
         if (user != null) {
             List<GrantedAuthority> authorities = new ArrayList<>();
             // Add any necessary roles or authorities based on your application logic
             authorities.add(new SimpleGrantedAuthority("USER"));
+            logger.info("Exiting loadUserByUsername()");
             return new User(user.getUsername(), user.getPassword(), authorities);
         } else {
+            logger.info("Exiting loadUserByUsername()");
             throw new UsernameNotFoundException("User not found with userName: " + userName);
         }
     }

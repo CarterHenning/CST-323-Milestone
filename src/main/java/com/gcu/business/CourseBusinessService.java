@@ -2,6 +2,8 @@ package com.gcu.business;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,12 +21,16 @@ public class CourseBusinessService implements CourseServiceInterface
     @Autowired
 	private CoursesDataService service;
 
+    private final Logger logger = LoggerFactory.getLogger(CourseBusinessService.class);
+
 
     @Override
     public void updateCourseRating(int courseId, int newRating) {
+        logger.info("Entering updateCourseRating()");
         CourseModel course = getCourseById(courseId);
         course.setRating(newRating);
         updateCourse(course, course.getId());
+        logger.info("Entering updateCourseRating()");
     }
 
     /**
@@ -34,6 +40,7 @@ public class CourseBusinessService implements CourseServiceInterface
      */
     @Override
     public List<CourseModel> getCourses() {
+        logger.info("Entering getCourses()");
         List<CourseEntity> courseEntities = service.findAll();
         
         List<CourseModel> coursesDomain = new ArrayList<>();
@@ -42,6 +49,7 @@ public class CourseBusinessService implements CourseServiceInterface
             courseModel.setId(entity.getId());
             coursesDomain.add(courseModel);
         }
+        logger.info("Exiting getCourses()");
         return coursesDomain;
     }
 
@@ -53,10 +61,12 @@ public class CourseBusinessService implements CourseServiceInterface
      */
     @Override
     public boolean createCourse(CourseModel newCourse) {
+        logger.info("Entering createCourse()");
         CourseEntity entity = new CourseEntity(newCourse.getId(), newCourse.getTitle(), newCourse.getDescription(), newCourse.getRating());
+        logger.info("Exiting createCourse()");
         return service.create(entity);
     }
-
+    
     /**
      * updates a course
      *
@@ -65,10 +75,12 @@ public class CourseBusinessService implements CourseServiceInterface
      */
     @Override
     public boolean updateCourse(CourseModel course, int id) {
+        logger.info("Entering updateCourse()");
         CourseEntity entity = service.findById(id);
         entity.setTitle(course.getTitle());
         entity.setDescription(course.getDescription());
         entity.setRating(course.getRating());
+        logger.info("Exiting updateCourse()");
         return service.update(entity);
     }   
 
@@ -81,13 +93,17 @@ public class CourseBusinessService implements CourseServiceInterface
     @Override
     public CourseModel getCourseById(int id) 
     {
+        logger.info("Entering getCourseById()");
         CourseEntity entity = service.findById(id);
         if (entity != null) {
             CourseModel model = new CourseModel(entity.getId(), entity.getTitle(), entity.getDescription(), entity.getRating());
             model.setId(entity.getId());
             
+            logger.info("Exiting getCourseById()");
             return model;
         }
+
+        logger.info("Exiting getCourseById()");
         return null;
     }
 
@@ -100,6 +116,8 @@ public class CourseBusinessService implements CourseServiceInterface
     @Override
     public boolean deleteCourse(int id)
     {
+        logger.info("Entering deleteCourse()");
+        logger.info("Exiting deleteCourse()");
         return service.delete(id);
     }
 }
