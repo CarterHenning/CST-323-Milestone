@@ -24,6 +24,8 @@ public class ReviewBusinessService implements ReviewServiceInterface {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+
+    // Method to calculate course average
     public int calculateAverageRating(int courseId) {
         logger.info("Entering calculateAverageRating()");
         List<ReviewEntity> reviews = reviewRepository.findByCourseId(courseId);
@@ -36,6 +38,7 @@ public class ReviewBusinessService implements ReviewServiceInterface {
         return total / reviews.size();
     }
 
+    // Method to create a review
     @Override
     public boolean createReview(ReviewModel newModel) {
         logger.info("Entering createReview()");
@@ -44,6 +47,7 @@ public class ReviewBusinessService implements ReviewServiceInterface {
         return service.create(entity);
     }
 
+    // Method to update review based on id passed in and new review data
     @Override
     public boolean updateReview(ReviewModel model, int id) {
         logger.info("Entering updateReview()");
@@ -58,6 +62,7 @@ public class ReviewBusinessService implements ReviewServiceInterface {
         return false;
     }
 
+    // Get reviews based on course id passed in
     @Override
     public List<ReviewModel> getReviewsByCourseId(int courseId) {
         logger.info("Entering getReviewsByCourseId()");
@@ -88,6 +93,7 @@ public class ReviewBusinessService implements ReviewServiceInterface {
         return new ArrayList<>();
     }
 
+    // get all reviews for a single user based on user id passed in
     @Override
     public ReviewModel getReviewByUserId(int userId) {
         logger.info("Entering getReviewByUserId()");
@@ -100,6 +106,7 @@ public class ReviewBusinessService implements ReviewServiceInterface {
         return null;
     }
     
+    // Get single review based on review ID
     @Override
     public ReviewModel getReviewById(int reviewId) {
         logger.info("Entering getReviewById()");
@@ -111,7 +118,7 @@ public class ReviewBusinessService implements ReviewServiceInterface {
         logger.info("Exiting getReviewById()");
         return null;
     }
-
+    // Method to delete a review
     @Override
     public boolean deleteReviews(int id) {
         logger.info("Entering deleteReviews()");
